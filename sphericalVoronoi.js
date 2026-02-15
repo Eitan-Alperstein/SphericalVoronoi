@@ -49,6 +49,17 @@ var pixels = Array.from({ length: HEIGHT }, () => Array.from({ length: WIDTH }, 
 var seeds = [];
 var searchRadius = WIDTH/2;
 
+const mod = (n, m) => ((n % m) + m) % m;
+
+function toroidalDist(x, y, px, py, width) {
+    const dx = Math.abs(x - px);
+    const wrappedDx = Math.min(dx, width - dx); // horizontal wrap
+
+    const dy = y - py; // no vertical wrap (since you only want horizontal)
+
+    return wrappedDx * wrappedDx + dy * dy;
+}
+
 function generateRandomSeeds(numSeeds, width, height) {
     for (var i = 0; i < numSeeds; i++) {
         const x = Math.floor(Math.random() * width);
@@ -68,7 +79,7 @@ function step(pixels, seeds, width, height) {
             for (var x = 0; x < width; x++) {
                 var directionsFound = [];
                 for (const [dx, dy] of DIRECTIONS) {
-                    const nx = x + dx * searchRadius;
+                    const nx = mod(x + dx * searchRadius,WIDTH);
                     const ny = y + dy * searchRadius;
 
                     if (nx >= 0 && nx < width && ny >= 0 && ny < height) {
@@ -82,13 +93,13 @@ function step(pixels, seeds, width, height) {
                     ? {
                         x: pixels[y][x].px,
                         y: pixels[y][x].py,
-                        dist: (x - pixels[y][x].px) ** 2 + (y - pixels[y][x].py) ** 2,
+                        dist: toroidalDist(x, y, pixels[y][x].px, pixels[y][x].py, width),
                         color: pixels[y][x].color
                         }
                     : { x: null, y: null, dist: Infinity, color: null };
 
                 for (var dir of directionsFound) {
-                    var dist = ( x - dir[0] ) ** 2 + ( y- dir[1] ) ** 2
+                    var dist = toroidalDist(x, y, dir[0], dir[1], width);
                     if (dist < bestDist.dist) {
                         bestDist = {
                             x: dir[0],
@@ -124,7 +135,7 @@ function renderPixels(pixels, width, height) {
     }
 }
 
-generateRandomSeeds(50, WIDTH, HEIGHT);
+generateRandomSeeds(10, WIDTH, HEIGHT);
 
 document.addEventListener("keydown", function (event) {
   if (event.key === "a") {
@@ -138,4 +149,4 @@ document.addEventListener("keydown", function (event) {
         ctx.fill();
     }
   }
-})
+});
