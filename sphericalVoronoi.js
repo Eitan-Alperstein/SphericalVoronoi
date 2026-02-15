@@ -138,4 +138,4 @@ document.addEventListener("keydown", function (event) {
         ctx.fill();
     }
   }
-});
+})
