@@ -13,9 +13,9 @@ function stepAndRender() {
 function autoplay() {
   const done = voronoi.searchRadius === 1;
   stepAndRender();
-  if (!done) setTimeout(() => requestAnimationFrame(autoplay), 250);
+  if (!done) setTimeout(autoplay, 250);
 }
-requestAnimationFrame(autoplay);
+setTimeout(autoplay, 0);
 
 // Press "s" to run one more pass by hand.
 document.addEventListener("keydown", function(event) {
